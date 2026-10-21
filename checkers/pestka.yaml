@@ -16,7 +16,7 @@ description: |
   `.aver-version` and compiles both with Cargo.
 url: https://github.com/jasisz/pestka
 ref: main
-rev: d21c08029768d5f47c08f2475e70f0907b051d28
+rev: 18fbb929472d18fcf1e998f1b4340d062c14e351
 build: |
   git clone https://github.com/jasisz/aver .aver-src
   git -C .aver-src checkout "$(cat .aver-version)"
