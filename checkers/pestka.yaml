@@ -7,20 +7,23 @@ description: |
   and the Nat and String literal extensions), following the reference
   kernel's algorithm. It was written by an AI agent under human guidance.
 
-  Declarations are checked on four worker threads, each against the
-  environment at its own place in the file; the verdict is the first failure
-  in file order. Facts about closed terms are kept across the declarations a
-  worker checks.
+  Declarations are checked in file order on one worker thread. What the
+  worker finds is kept from one declaration to the next: the results of
+  inference, checking, reduction and comparison, for open terms as well as
+  closed ones. A free variable is named by its type, its value and a level
+  above the free variables of its binder, so a binder opened again, in the
+  same declaration or a later one, gets the same variable, and what was
+  found about the terms under it holds again.
 
   The build clones Aver at the commit the repository pins in
   `.aver-version` and compiles both with Cargo.
 url: https://github.com/jasisz/pestka
 ref: main
-rev: fe0459e716d38b5b0dc6df12894778994cedec59
+rev: c9dc9ff13d06a8f60f28ef3b68469e9d9a3d8ac5
 build: |
   git clone https://github.com/jasisz/aver .aver-src
   git -C .aver-src checkout "$(cat .aver-version)"
   cargo install --path .aver-src aver-lang --locked --root "$PWD/.aver"
   AVER="$PWD/.aver/bin/aver" bin/build
-run: .build/target/release/main "$IN" 4
-threads: 4
+run: .build/target/release/main "$IN" 1
+threads: 1
