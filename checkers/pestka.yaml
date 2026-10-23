@@ -10,16 +10,17 @@ description: |
   Declarations are checked in file order on one worker thread. What the
   worker finds is kept from one declaration to the next: the results of
   inference, checking, reduction and comparison, for open terms as well as
-  closed ones. A free variable is named by its type, its value and a level
-  above the free variables of its binder, so a binder opened again, in the
-  same declaration or a later one, gets the same variable, and what was
-  found about the terms under it holds again.
+  closed ones. A free variable is its type and value and how many
+  variables of the same type and value are open where its binder is
+  opened, so a binder opened again, in the same declaration or a later
+  one, gets the same variable, and so does a binder of the same type in
+  another theorem; what was found about the terms under it holds again.
 
   The build clones Aver at the commit the repository pins in
   `.aver-version` and compiles both with Cargo.
 url: https://github.com/jasisz/pestka
 ref: main
-rev: c9dc9ff13d06a8f60f28ef3b68469e9d9a3d8ac5
+rev: d584d4bee7114aa34e456bb3b80cb74f906c62b2
 build: |
   git clone https://github.com/jasisz/aver .aver-src
   git -C .aver-src checkout "$(cat .aver-version)"
