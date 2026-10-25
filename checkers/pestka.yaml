@@ -7,37 +7,25 @@ description: |
   and the Nat and String literal extensions), following the reference
   kernel's algorithm. It was written by an AI agent under human guidance.
 
-  Declarations are checked in file order on one worker thread. What the
-  worker finds is kept from one declaration to the next: the results of
-  inference, checking, reduction and comparison, for open terms as well as
-  closed ones. A free variable is its type and value and how many
-  variables of the same type and value are open where its binder is
-  opened, so a binder opened again, in the same declaration or a later
-  one, gets the same variable, and so does a binder of the same type in
-  another theorem; what was found about the terms under it holds again.
-  Terms leave out the names and annotations of binders, as Lean's equality
-  of expressions does, so a result is found again for a term that differs
-  from a known one only in such names, and each term carries ten bits for
-  the free variables that may occur in it, so closing a binder skips the
-  subterms its variable cannot be in.
+  Declarations are checked in file order on one worker, which keeps what it
+  finds from one declaration to the next. A free variable is named by its
+  type, value and how many of its kind are open, so a binder opened again
+  gets the same variable and what was found under it holds again. Proof
+  arguments of one constant are not compared. Weak head normalization runs
+  a lazy machine that unfolds a matcher into its callers once and goes from
+  a casesOn straight to its branch.
 
-  Two applications of one constant are compared argument by argument, and
-  an argument in a place whose domain is a proposition is left out once
-  the arguments before it are equal: proofs of one proposition are equal.
-  A term's packed metadata, the numbers of variables and the keys of every
-  memo and cache are refinements over Int bounded below 2^62, which Aver
-  holds as machine words, and a casesOn whose value is its recursor's goes
-  straight to the minor premise of its major premise's constructor.
-
-  The build clones Aver at the commit the repository pins in
-  `.aver-version` and compiles both with Cargo.
+  The build clones Aver at the commit pinned in `.aver-version` and builds
+  Pestka with a profile from checking `init-prelude`.
 url: https://github.com/jasisz/pestka
 ref: main
-rev: 4b245df331cad80aa65edaf3369109dc70f01b39
+rev: 7629b47abef63d0702478315d3ad60dd9c3c6db8
 build: |
   git clone https://github.com/jasisz/aver .aver-src
   git -C .aver-src checkout "$(cat .aver-version)"
   cargo install --path .aver-src aver-lang --locked --root "$PWD/.aver"
-  AVER="$PWD/.aver/bin/aver" bin/build
+  ROOT=$(cd ../../../.. && pwd)
+  "$ROOT/lka.py" build-test init-prelude
+  AVER="$PWD/.aver/bin/aver" FLAGS="-C target-cpu=native" bin/build-pgo "$ROOT/_build/tests/init-prelude.ndjson"
 run: .build/target/release/main "$IN" 1
 threads: 1
