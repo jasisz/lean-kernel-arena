@@ -21,11 +21,19 @@ description: |
   the free variables that may occur in it, so closing a binder skips the
   subterms its variable cannot be in.
 
+  Two applications of one constant are compared argument by argument, and
+  an argument in a place whose domain is a proposition is left out once
+  the arguments before it are equal: proofs of one proposition are equal.
+  A term's packed metadata, the numbers of variables and the keys of every
+  memo and cache are refinements over Int bounded below 2^62, which Aver
+  holds as machine words, and a casesOn whose value is its recursor's goes
+  straight to the minor premise of its major premise's constructor.
+
   The build clones Aver at the commit the repository pins in
   `.aver-version` and compiles both with Cargo.
 url: https://github.com/jasisz/pestka
 ref: main
-rev: 370948c71793c3d5b45f775a5c8aa414c5fa943f
+rev: 4b245df331cad80aa65edaf3369109dc70f01b39
 build: |
   git clone https://github.com/jasisz/aver .aver-src
   git -C .aver-src checkout "$(cat .aver-version)"
