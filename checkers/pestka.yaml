@@ -20,7 +20,7 @@ description: |
   WebAssembly is the `pestka-wasm` entry.
 url: https://github.com/jasisz/pestka
 ref: main
-rev: f7866271a045282e37b0e83ea315e3cd8bfb9c83
+rev: 6e12126c784c8600d82aad363a01864942f5a35c
 build: |
   git clone https://github.com/jasisz/aver .aver-src
   git -C .aver-src checkout "$(cat .aver-version)"
