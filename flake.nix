@@ -24,6 +24,7 @@
           pypy
           monolith
           nodejs
+          binaryen
           ocaml
           opam
           gmp
