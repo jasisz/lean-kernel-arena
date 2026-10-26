@@ -1,0 +1,28 @@
+description: |
+  **pestka-wasm** is the [Pestka](https://github.com/jasisz/pestka) kernel as
+  WebAssembly. The same Aver source as the `pestka` entry is compiled by
+  [Aver](https://github.com/jasisz/aver)'s own wasm-gc backend (not through
+  Rust or LLVM) and runs on V8 under Node. Terms, maps and closures are
+  objects of the engine's garbage collector, and the module is about 0.4 MB.
+  It gives the same answers as `pestka`; the gap between the two entries is
+  what a garbage-collected wasm target costs a Lean kernel, and Aver's
+  backend keeps working on it.
+
+  Declarations are checked in file order on one thread. `bin/run-wasm`
+  passes on Pestka's exit status only when its verdict line agrees with it,
+  and exits with 3 otherwise, so a crash of V8 or of the host never reads
+  as a verdict.
+
+  The build clones Aver at the commit pinned in `.aver-version` and takes
+  Binaryen from the arena's own nixpkgs to optimize the module for speed.
+url: https://github.com/jasisz/pestka
+ref: main
+rev: 83d246a0f5db2f3b4e095c4c041c8b9634702bcb
+build: |
+  git clone https://github.com/jasisz/aver .aver-src
+  git -C .aver-src checkout "$(cat .aver-version)"
+  cargo install --path .aver-src aver-lang --locked --features wasm --root "$PWD/.aver"
+  nix --extra-experimental-features "nix-command flakes" build "github:NixOS/nixpkgs/0ad6f47ea4fe188f4bc8f0380f93ae8523337c6c#binaryen" --out-link .binaryen
+  PATH="$PWD/.binaryen/bin:$PATH" AVER="$PWD/.aver/bin/aver" bin/build-wasm
+run: AVER_SRC="$PWD/.aver-src" bin/run-wasm "$IN" 1
+threads: 1

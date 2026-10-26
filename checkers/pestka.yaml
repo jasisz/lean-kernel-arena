@@ -16,16 +16,17 @@ description: |
   a casesOn straight to its branch.
 
   The build clones Aver at the commit pinned in `.aver-version` and builds
-  Pestka with a profile from checking `init-prelude`.
+  Pestka with a profile from checking `Init`. The same source compiled to
+  WebAssembly is the `pestka-wasm` entry.
 url: https://github.com/jasisz/pestka
 ref: main
-rev: 7629b47abef63d0702478315d3ad60dd9c3c6db8
+rev: 83d246a0f5db2f3b4e095c4c041c8b9634702bcb
 build: |
   git clone https://github.com/jasisz/aver .aver-src
   git -C .aver-src checkout "$(cat .aver-version)"
   cargo install --path .aver-src aver-lang --locked --root "$PWD/.aver"
   ROOT=$(cd ../../../.. && pwd)
-  "$ROOT/lka.py" build-test init-prelude
-  AVER="$PWD/.aver/bin/aver" FLAGS="-C target-cpu=native" bin/build-pgo "$ROOT/_build/tests/init-prelude.ndjson"
+  "$ROOT/lka.py" build-test init
+  AVER="$PWD/.aver/bin/aver" FLAGS="-C target-cpu=native" bin/build-pgo "$ROOT/_build/tests/init.ndjson"
 run: .build/target/release/main "$IN" 1
 threads: 1
