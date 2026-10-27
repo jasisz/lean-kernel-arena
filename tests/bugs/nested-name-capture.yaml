@@ -1,0 +1,30 @@
+description: |
+  Proof of False via a later declaration that takes the name of a temporary
+  constant made while checking a nested inductive type.
+
+  Checking the nested inductive `Shadow` (its constructor holds a `Cov Shadow`)
+  makes temporary declarations `_nested.Cov_1`, `_nested.Cov_1.mk` and
+  `_nested.Cov_1.rec`, which are gone once the block is admitted. The exported
+  rule of `Shadow.rec` for its nested constructor calls `_nested.Cov_1.rec`;
+  while the block is checked that is the temporary recursor, and the rule
+  reduces to the one the kernel derives. Later in the file an ordinary
+  definition takes the name `_nested.Cov_1.rec`, and the admitted rule now
+  calls it.
+
+  Through that definition, `Shadow.rec` returns `⟨B.zero, True.intro⟩` where
+  its type promises a dependent pair whose second component has type `False`
+  when the first is `B.zero`. The second projection is a proof of `False`, and
+  the file ends in `theorem boom : False`, without axioms.
+
+  A checker must not let an admitted rule refer to a constant that existed only
+  while the block was checked, for instance by choosing temporary names that no
+  declaration in the file uses. The official kernel rejects the file.
+
+  Nanoda, nanoclo, nanobruijn and sokonanoda accepted this export. Found by a
+  differential run of Pestka against other checkers.
+# Hand-written export file: made from the export of a valid nested inductive
+# (Lean 4.34.1) by replacing the rule of Shadow.rec and adding the later
+# declarations; Lean derives the recursor rules itself, so lean4export cannot
+# produce it.
+file: tests/bugs/nested-name-capture.ndjson
+outcome: reject
