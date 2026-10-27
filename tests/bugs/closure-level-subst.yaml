@@ -1,0 +1,35 @@
+description: |
+  Proof of False via two closures that differ only in their universe levels.
+
+  ```
+  def FalseTy : Prop := ∀ P : Prop, P
+  def TrueTy : Prop := ∀ P : Prop, P → P
+  def trueProof : TrueTy := fun _ p => p
+  def A : Type := Prop → Prop → Prop
+  def seed : A := fun x _ => x
+  def Family.{u} : Sort (max 1 (u + 1)) := A → Sort u
+  def good : Family.{1} := fun _ => A
+  def lower : Family.{0} := good
+  def lowA : Prop := lower seed
+  def a : lowA := fun x _ => x
+  def b : lowA := fun _ y => y
+  def D (f : lowA) : Prop := f TrueTy FalseTy
+  def pa : D a := trueProof
+  theorem boom : D b := pa
+  ```
+
+  `lower` is ill typed: `good` has type `A → Type`, and `Family.{0}` is
+  `A → Prop`. Both function types are `Family`'s body, `A → Sort u`, under
+  empty environments that differ only in what `u` stands for. A checker that
+  compares such closures by their body, domain and environment, and takes two
+  empty environments to be equal whatever their universe substitutions, finds
+  them equal. Then `lowA` is a proposition that reduces to `A`, two different
+  functions inhabit it, and `D b` reduces to `FalseTy`. The file has no axioms
+  and no inductive types.
+
+  Sokonanoda accepted this export. Found by a differential run of Pestka against
+  other checkers.
+# Hand-written export file: Lean does not elaborate `lower`, so lean4export
+# cannot produce it.
+file: tests/bugs/closure-level-subst.ndjson
+outcome: reject
