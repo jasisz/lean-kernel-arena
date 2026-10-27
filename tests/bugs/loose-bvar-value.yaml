@@ -1,0 +1,29 @@
+description: |
+  A definition whose value is a loose bound variable, met before it is checked.
+
+  The export is that of
+  ```
+  def f.{u} (α : Sort u) : Sort u := α
+  inductive T (γ : f Type) : Type
+    | mk : γ → T γ
+  ```
+  with the value of `f` replaced by the bound variable `#0`, which no binder
+  binds. The official kernel rejects `f`: its type checker does not support
+  loose bound variables.
+
+  A checker that checks an inductive declaration as soon as it meets it, but
+  defers definitions, reaches `f` first through `T.mk`: the type of its field
+  must be a sort, so `f Type` is reduced, and unfolding `f` gives `#0 Type`.
+  Pestka looked the variable up in an empty environment, found `#0` again,
+  and hung until it was
+  [fixed](https://github.com/jasisz/pestka/commit/4a43846870332b7dfd2c891dc9273a05cd5b308a).
+
+  Found by a differential run of Pestka against other checkers, which also
+  showed that a loose bound variable in a value stops sokonanoda with an
+  internal error, and makes nanoda, nanoclo and nanobruijn panic (their
+  runners here report any failure as a rejection).
+# Hand-written export file: lean4export does not write loose bound variables.
+# With the value of f restored to `fun α => α` (a `lam` over `bvar 0`), the
+# official kernel accepts the file.
+file: tests/bugs/loose-bvar-value.ndjson
+outcome: reject
