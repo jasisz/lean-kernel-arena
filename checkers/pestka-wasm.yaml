@@ -17,7 +17,7 @@ description: |
   optimizes the module for speed with Binaryen's `wasm-opt`.
 url: https://github.com/jasisz/pestka
 ref: main
-rev: 4a43846870332b7dfd2c891dc9273a05cd5b308a
+rev: 02a56c89ecd05b673f9db4f34fd02475b8e54d89
 build: |
   git clone https://github.com/jasisz/aver .aver-src
   git -C .aver-src checkout "$(cat .aver-version)"

@@ -1,0 +1,25 @@
+description: |
+  Proof of False via a function whose codomain is checked against the type of
+  its body's value instead of the value itself.
+
+  ```
+  def FalseTy : Prop := ∀ P : Prop, P
+  def TrueTy : Prop := ∀ P : Prop, P → P
+  def trueProof : TrueTy := fun _ p => p
+  def bad : TrueTy → FalseTy := fun _ => FalseTy
+  theorem boom : FalseTy := bad trueProof
+  ```
+
+  `bad` is ill typed: its value has type `TrueTy → Prop`. A checker that
+  represents both function types as closures over the same body, `FalseTy`, and
+  compares two such closures by their body, domain and environment alone,
+  without telling a closure that evaluates the body from one that infers its
+  type, finds `TrueTy → Prop` equal to `TrueTy → FalseTy`. The file has no
+  axioms and no inductive types.
+
+  Sokonanoda accepted this export. Found by a differential run of Pestka against
+  other checkers.
+# Hand-written export file: Lean does not elaborate `bad`, so lean4export cannot
+# produce it.
+file: tests/bugs/pi-closure-context.ndjson
+outcome: reject
