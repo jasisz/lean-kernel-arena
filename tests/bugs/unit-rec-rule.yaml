@@ -1,0 +1,25 @@
+description: |
+  Proof of False via a wrong recursor rule for a constructor without fields.
+
+  The export declares `PUnit` as the prelude does, but the computation rule of
+  `PUnit.rec` for `PUnit.unit` returns `PUnit.unit` instead of the minor premise:
+  ```
+  fun motive unit => PUnit.unit      -- instead of fun motive unit => unit
+  ```
+  With this rule, `PUnit.rec (motive := fun _ => Prop) EmptyProp PUnit.unit`
+  reduces to `PUnit.unit`, so
+  ```
+  theorem badR : PUnit.rec (motive := fun _ => Prop) EmptyProp PUnit.unit := PUnit.unit
+  theorem boom : EmptyProp := badR
+  ```
+  is a closed proof of an empty proposition, with no axioms. A checker must
+  derive the rule itself and reject an export whose rule differs from it, as the
+  official kernel does.
+
+  Sokonanoda accepted this export; it rejects `bugs/nat-rec-rules`, whose wrong
+  rule is for a constructor with fields. Found by a differential run of Pestka
+  against other checkers.
+# Hand-written export file: lean4export writes the recursor rules Lean derived,
+# so it cannot produce a wrong one.
+file: tests/bugs/unit-rec-rule.ndjson
+outcome: reject
