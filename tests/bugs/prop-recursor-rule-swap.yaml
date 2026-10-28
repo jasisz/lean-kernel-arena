@@ -1,0 +1,29 @@
+description: |
+  Swapped computation rules for a two-constructor inductive in `Prop`.
+
+  The honest recursor for
+  ```
+  inductive BoolProp : Prop where
+    | a : BoolProp
+    | b : BoolProp
+  ```
+  has the rules
+  ```
+  BoolProp.a => fun motive a b => a
+  BoolProp.b => fun motive a b => b
+  ```
+  but the export swaps their right-hand sides. The official kernel rejects it
+  with `Invalid recursor BoolProp.rec`: imported recursor metadata must match
+  the rule the kernel derives.
+
+  This is a validation regression rather than a claimed proof of `False`. The
+  recursor eliminates only into `Prop`, and attempts to escalate the mismatch
+  through large elimination were rejected.
+
+  Pestycyd generated the case automatically from a valid seed using its
+  correlated `recursor-rule-permutations` campaign. Nanoda, Nanoclo,
+  Nanobruijn and Sokonanoda accepted it; Pestka, Kefir and Tenet rejected it.
+  Tracked upstream as ammkrn/nanoda_lib#76 and intgrah/sokonanoda#11.
+# Hand-written mutation: lean4export writes the rules derived by Lean.
+file: tests/bugs/prop-recursor-rule-swap.ndjson
+outcome: reject
