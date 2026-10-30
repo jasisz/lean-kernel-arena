@@ -26,5 +26,5 @@ description: |
   fuzzing of export checkers against the official kernel.
 # Hand-written export file: Lean refuses `U` when elaborating it, so
 # lean4export cannot produce it.
-file: tests/bugs/inductive-undeclared-universe.ndjson
+file: tests/other/inductive-undeclared-universe.ndjson
 outcome: reject
