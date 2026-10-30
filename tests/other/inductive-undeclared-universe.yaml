@@ -1,0 +1,30 @@
+description: |
+  An inductive type whose type mentions a universe parameter it does not
+  declare.
+
+  The export declares, in this order:
+
+  1. `inductive U : Sort u` with constructors `U.a U.b : U` and its recursor
+     into `Prop`, with `levelParams: []` everywhere: `u` is not a parameter of
+     the block;
+  2. `def P.{u} : Sort u := U`, which does declare `u`, so the free `u` in the
+     type of `U` is read as `P`'s own parameter;
+  3. `theorem pa : P.{0} := U.a` and `theorem pb : P.{0} := U.b`.
+
+  At `u := 0` the type `U` becomes a proposition with two distinct proofs.
+  The elimination restriction still holds (the recursor only eliminates into
+  `Prop`), so this file does not lead to `False`, but every declaration after
+  `U` is checked against a type that has no fixed universe.
+
+  A checker must reject `U` itself: the universe parameters occurring in the
+  types of an inductive block and its constructors must be among the block's
+  `levelParams`, exactly as for definitions, theorems and axioms. The official
+  kernel rejects with `invalid reference to undefined universe level parameter
+  'u'`.
+
+  Nanoda, nanoclo and nanobruijn accepted this export. Found by differential
+  fuzzing of export checkers against the official kernel.
+# Hand-written export file: Lean refuses `U` when elaborating it, so
+# lean4export cannot produce it.
+file: tests/other/inductive-undeclared-universe.ndjson
+outcome: reject
